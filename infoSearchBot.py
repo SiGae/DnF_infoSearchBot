@@ -43,17 +43,15 @@ def SearchAuction(message):
     searchItem = message.text.replace("/auc ", "")
     print(searchItem)
     print(1)
-    url = 'https://api.neople.co.kr/df/auction?'
+    url = 'https://api.neople.co.kr/df/auction?sort=unitPrice:asc&'
     print(3)
     param = urllib.parse.urlencode({
 
         'itemName': searchItem,
         'limit': 5,
         'wordType': 'full',
-        'apikey': private.dnfApiToken,
-        'sort' : '',
-
-    }) + 'unitPrice:asc'
+        'apikey': private.dnfApiToken
+    })
 
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -61,12 +59,11 @@ def SearchAuction(message):
     print(url + param)
     urlOpen = urllib.request.urlopen(url + param)
     # print(1)
-    infoJSON = json.loads(urlOpen.read())
+    infoJSON = json.loads(urlOpen.read().decode('utf-8'))
 
     k = 0
     while k < 5:
-        a = ''
-        a += '이름 : {}\n'.format(infoJSON['rows'][k]['itemName'])
+        a = '이름 : {}\n'.format(infoJSON['rows'][k]['itemName'])
         a += '개당 가격 : {}\n'.format(infoJSON['rows'][k]['unitPrice'])
         a += '총액 : {}\n'.format(infoJSON['rows'][k]['currentPrice'])
         a += '수량 : {}\n'.format(infoJSON['rows'][k]['count'])
