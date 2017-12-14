@@ -38,10 +38,45 @@ def FindServerName(serverName) -> str:
 def check_activate(message):
     bot.reply_to(message, "정상 작동 중 입니다.")
 
+@bot.message_handler(commands=['auc'])
+def SearchAuction(message):
+    searchItem = message.text.replace("/auc ", "")
+    print(searchItem)
+    print(1)
+    url = 'https://api.neople.co.kr/df/auction?'
+    print(3)
+    param = urllib.parse.urlencode({
 
-@bot.message_handler(commands=['info'])
+        'itemName': searchItem,
+        'limit': 5,
+        'wordType': 'full',
+        'apikey': private.dnfApiToken,
+        'sort' : '',
+
+    }) + 'unitPrice:asc'
+
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    print(2)
+    print(url + param)
+    urlOpen = urllib.request.urlopen(url + param)
+    # print(1)
+    infoJSON = json.loads(urlOpen.read())
+
+    k = 0
+    while k < 5:
+        a = ''
+        a += '이름 : {}\n'.format(infoJSON['rows'][k]['itemName'])
+        a += '개당 가격 : {}\n'.format(infoJSON['rows'][k]['unitPrice'])
+        a += '총액 : {}\n'.format(infoJSON['rows'][k]['currentPrice'])
+        a += '수량 : {}\n'.format(infoJSON['rows'][k]['count'])
+        k += 1
+        bot.send_message(message.chat.id, a)
+    i = 0
+
+@bot.message_handler(commands=['search'])
 def SearchCharName(message):
-    text = message.text.replace("/info ", "").split()
+    text = message.text.replace("/search ", "").split()
     print(text)
     charServer = FindServerName(text[0])
     charName = text[1]
@@ -49,7 +84,7 @@ def SearchCharName(message):
     param = urllib.parse.urlencode({
         'characterName': charName,
         'limit': 50,
-        'wordType': '<wordType>',
+        'wordType': 'match',
         'apikey': private.dnfApiToken
     })
 
